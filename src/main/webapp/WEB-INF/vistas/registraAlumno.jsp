@@ -50,7 +50,18 @@
 
 $("#id_registrar").click(function (){ 
 
-
+	$.ajax({
+		type: "POST",
+		url: "registraAlumno",
+		data: $('#id_form').serialize(),
+		success: function(data){
+			mostrarMensaje(data.MENSAJE);
+		},
+		error: function(){
+			mostrarMensaje(MSG_ERROR);
+		}
+	});
+	
 });
 
 
@@ -91,7 +102,7 @@ $(document).ready(function() {
                         },
                         regexp: {
                             regexp: /^[0-9]{8}$/,
-                            message: 'el dni es 8 dígitos'
+                            message: 'el dni es 8 dï¿½gitos'
                         }
                     }
                 },
