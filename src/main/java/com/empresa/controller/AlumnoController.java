@@ -6,7 +6,6 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.empresa.entity.Alumno;
@@ -33,14 +32,20 @@ public class AlumnoController {
 	public HashMap<String, String> registra(Alumno obj) {
 		
 		HashMap<String, String> salida = new HashMap<>();
-		Alumno objSalida = service.insertaAlumno(obj);
 		
-		if(objSalida == null) {
-			salida.put("MENSAJE", "Error al registrar");
-		}else {
-			salida.put("MENSAJE", "Registro exitoso");
+		if(service.existsByDni(obj.getDni())) {
+			salida.put("MENSAJE", "El DNI ya existe");
+		} else if (service.existsByCorreo(obj.getCorreo())) {
+			salida.put("MENSAJE", "El Correo ya existe");
+		} else {
+			Alumno objSalida = service.insertaAlumno(obj);
+			if (objSalida == null) {
+				salida.put("MENSAJE", "Error al registrar");
+			} else {
+				salida.put("MENSAJE", "Registro exitoso");
+			}
 		}
-
+		
 		return salida;
 	}
 	

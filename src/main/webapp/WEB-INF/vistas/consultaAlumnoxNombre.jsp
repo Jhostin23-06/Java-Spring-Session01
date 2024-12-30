@@ -20,6 +20,11 @@
 	href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css" />
 <link rel="stylesheet" href="css/bootstrap.css" />
 <link rel="stylesheet" href="css/bootstrapValidator.css" />
+<script
+	src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+<!-- SweetAlert2 CSS -->
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
 <title>Consulta de alumnos</title>
 </head>
@@ -37,6 +42,8 @@
 					placeholder="Ingrese el nombre">
 			</div>
 			<button type="submit" id="id_filtro" class="btn btn-primary">Buscar</button>
+			<button type="button" class="btn btn-success" data-toggle="modal"
+				data-target="#registerModal">Registrar</button>
 		</form>
 
 		<h3 class="text-center">Resultados de la Búsqueda:</h3>
@@ -61,9 +68,60 @@
 
 	</div>
 
+	<!-- Estructura del Modal -->
+	<div class="modal fade" id="registerModal" tabindex="-1" role="dialog"
+		aria-labelledby="registerModalLabel" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="registerModalLabel">Registrar
+						Alumno</h5>
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<!-- Formulario para registrar un alumno -->
+					<form id="registerForm">
+						<div class="form-group">
+							<label for="nombre">Nombre:</label> <input type="text"
+								class="form-control" id="nombre" name="nombre" required>
+						</div>
+						<div class="form-group">
+							<label for="dni">DNI:</label> <input type="text"
+								class="form-control" id="dni" name="dni" required>
+						</div>
+						<div class="form-group">
+							<label for="correo">Correo:</label> <input type="email"
+								class="form-control" id="correo" name="correo" required>
+						</div>
+						<div class="form-group">
+							<label for="fechaNacimiento">Fecha de Nacimiento:</label> <input
+								type="date" class="form-control" id="fechaNacimiento"
+								name="fechaNacimiento" required>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary"
+						data-dismiss="modal">Cerrar</button>
+					<button type="button" class="btn btn-primary" id="saveButton">Guardar</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
 
 	<script type="text/javascript">
 		$(document).ready(function() {
+			// Llamada AJAX para obtener todos los datos al cargar la página
+		    $.getJSON("filtraAlumnoxNombre", {
+		        "nombre": ""
+		    }, function(lista) {
+		        agregarGrilla(lista);
+		    });
+			
 			$("#defaultForm").submit(function(event) {
 				event.preventDefault(); // Prevenir el envío del formulario
 
@@ -75,6 +133,50 @@
 					agregarGrilla(lista);
 				});
 			});
+			$('#saveButton').click(function() {
+				var formData = {
+				        nombre: $('#nombre').val(),
+				        dni: $('#dni').val(),
+				        correo: $('#correo').val(),
+				        fechaNacimiento: $('#fechaNacimiento').val()
+				};
+				
+				$.ajax({
+			        type: 'POST',
+			        url: 'registraAlumno', // Ajusta la URL según tu controlador
+			        data: formData,
+			        success: function(response) {
+			        	if (response.MENSAJE === 'Registro exitoso') {
+		                    $('#registerModal').modal('hide');
+		                    Swal.fire({
+		                        icon: 'success',
+		                        title: response.MENSAJE,
+		                        showConfirmButton: true
+		                    }).then(() => {
+		                    	// que se actualice la tabla
+		                    	$.getJSON("filtraAlumnoxNombre", { "nombre": "" }, function(lista) {
+                                    agregarGrilla(lista);
+		                    	});
+		                    });
+		                } else {
+		                    Swal.fire({
+		                        icon: 'error',
+		                        title: response.MENSAJE,
+		                        showConfirmButton: true
+		                    });
+		                }
+			        },
+			        error: function(error) {
+			        	Swal.fire({
+		                    icon: 'error',
+		                    title: 'Error al registrar el alumno',
+		                    showConfirmButton: true
+		                });
+			        }
+			    });
+			});
+			
+			
 		});
 
 		function agregarGrilla(lista) {
@@ -89,7 +191,7 @@
 				searching : false,
 				ordering : true,
 				processing : true,
-				pageLength : 10,
+				pageLength : 15,
 				lengthChange : false,
 				columns : [ {
 					data : 'idAlumno'

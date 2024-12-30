@@ -10,4 +10,8 @@ public interface AlumnoRepository extends JpaRepository<Alumno, Integer> {
 
 	public List<Alumno> findByNombreLike(String nombre);
 
+	public boolean existsByDni(String dni);
+
+	public boolean existsByCorreo(String correo);
+
 }

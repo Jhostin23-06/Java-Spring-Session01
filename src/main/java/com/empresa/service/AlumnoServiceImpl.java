@@ -25,5 +25,15 @@ public class AlumnoServiceImpl implements AlumnoService {
 		// TODO Auto-generated method stub
 		return repository.findByNombreLike(nombre);
 	}
+	
+	@Override
+    public boolean existsByDni(String dni) {
+        return repository.existsByDni(dni);
+    }
+
+    @Override
+    public boolean existsByCorreo(String correo) {
+        return repository.existsByCorreo(correo);
+    }
 
 }

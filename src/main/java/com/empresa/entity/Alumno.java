@@ -30,10 +30,10 @@ public class Alumno {
 	@Column(name="nombre")
 	private String nombre;
 	
-	@Column(name="dni")
+	@Column(name="dni", unique= true)
 	private String dni;
 	
-	@Column(name="correo")
+	@Column(name="correo", unique = true)
 	private String correo;
 	
 	@Column(name="fechaNacimiento")
